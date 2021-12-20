@@ -18,15 +18,10 @@ contract EHR{
         string record_date;
         address patient_id;
         string birth_date;
-        string patient_name; // FIRST NAME|MAIDEN NAME|LAST NAME|SUFFIX
-        //string last_name;
-        //string suffix;
-        //string maiden_name;
-        //string marital_status;
+        string patient_name;
         string gender;
         string home_address;
         string city;
-        //string ssn;
         uint vaccine_code_num;
         string desc;
         string base_cost;
@@ -58,7 +53,7 @@ contract EHR{
     // wallet address used as primary key
     mapping(address => User) users;
 
-    constructor() public{
+    constructor() public {
         initialize();
     }
 
@@ -92,14 +87,9 @@ contract EHR{
             record.patient_id = msg.sender;
             record.birth_date = birthday;
             record.patient_name = name;
-            //record.last_name = lName;
-            //record.suffix = sName;
-            //record.maiden_name = mName;
-            //record.marital_status = mStatus;
             record.gender = _gender;
             record.home_address = hAddress;
             record.city = _city;
-            //record.ssn = ssNum;
             record.vaccine_code_num = code;
             record.desc = description;
             record.base_cost = bCost;
@@ -170,42 +160,31 @@ contract EHR{
 
     function storeKey(uint accessID, string memory generated_key) public {
 
-
-        // retrieve record for key generation using record id provided
         // use provided algorithm to generate key for the specified record
 
-        // store key
+        // store key in the placehplder of the existing access permission
         permissions[accessID].key = generated_key;
-
-        // return generated key here
-        //return "key eto";
     }
 
     function invalidateKey(uint accessID) public {
 
 
-        // retrieve record for key generation using record id provided
-        // use provided algorithm to generate key for the specified record
-
-        // store key
+        // invalidate key by removing key identifier in previous R access permission
         permissions[accessID].key = "";
 
-        // return generated key here
-        //return "key eto";
     }
 
     function invoke_Permission(uint accessID, address recipient, uint recordID) public {
 
-        // generate key here
-        //string memory generated_key = generateKey(algorithm, request.recordID);
+        // generate key
 
-        // invoke by pushing request as updated/latest access permission ++ include generated key in this push
+        // invoke by pushing request as updated/latest access permission ++ key identifier placeholder
         permissions.push(Permission(accessID, recipient, recordID, "R", ""));
     }
 
     function revoke_Permission(uint accessID, address recipient, uint recordID) public {
 
-        // invalidate key here
+        // invalidate key in the latest R access permission
         uint invalidate_index = uint(get_OAP_index(recipient, recordID));
         invalidateKey(invalidate_index);
         // remove from key storage
@@ -222,8 +201,8 @@ contract EHR{
             return (1, request.accessID, request.recipient, request.recordID); //invoke_Permission(request); // return 1
 
         }
-        // with existing access permission
 
+        // with existing access permission
         Permission memory OAP = permissions[uint(OAP_index)];
 
         // if same access change to the original access permission, drop request and decrease accessCtr by 1
@@ -271,6 +250,57 @@ contract EHR{
         return (0, 0, 0x0000000000000000000000000000000000000000, 0);
     }
 
+    function createNotif(uint accessID) public view returns (uint, address, string memory, string memory) {
+
+        // retrieve the current access permission
+        Permission memory OAP = permissions[accessID];
+
+        // retrieve access permission info if there is read access
+        if(keccak256(abi.encodePacked(OAP.access)) == keccak256(abi.encodePacked("R"))) {
+
+            //      access id,      recipient,      UAP,        valid key identifier
+            return (OAP.accessID, OAP.recipient, "Read Access", OAP.key);
+
+        }
+        else if(keccak256(abi.encodePacked(OAP.access)) == keccak256(abi.encodePacked("N"))) {
+
+            //      access id,      recipient,      UAP,        invalidated key identifier
+            return (OAP.accessID, OAP.recipient, "No Access", OAP.key);
+
+        }
+
+        // no existing current permission
+        return (0, 0x0000000000000000000000000000000000000000, "Drop", "");
+    }
+
+    // This function verifies updated access permission for record retrieval
+    function verify_AP(address currentAcct, uint recordID) public view returns (uint) {
+
+        bool isOwner = verifyOwner(currentAcct, recordID);
+
+        if(isOwner) {
+
+            // owner of record
+            return 1;
+        }
+
+        int256 isRecepient = get_OAP_index(currentAcct, recordID);
+
+        if(isRecepient != -1) {
+
+            Permission memory UAP = permissions[uint(isRecepient)];
+
+            if(keccak256(abi.encodePacked(UAP.access)) == keccak256(abi.encodePacked("R"))) {
+              // valid recipient of record
+                return 2;
+            }
+        }
+
+        // not valid owner or recipient
+        return 0;
+
+    }
+
     //function for pushing users
     function insertUser(address walletAddress, string memory userRole) public {
 
@@ -283,19 +313,9 @@ contract EHR{
 
     }
 
-    function retrieve_record(uint record_id) public view returns
+    function pullRecord(uint record_id) public view returns
     (uint, string memory, address, string memory, string memory, uint, string memory) {
         Record storage record = records[record_id];
-        /*
-        string memory splitName = record.patient_name;
-        string memory cut = "|";
-        string[4] memory separatedName;
-
-        separatedName.push(splitName.split(cut).toString());
-        separatedName.push(splitName.split(cut).toString());
-        separatedName.push(splitName.split(cut).toString());
-        separatedName.push(splitName.split(cut).toString());
-        */
 
         return (record.record_id, record.record_date, record.patient_id, record.patient_name, record.gender, record.vaccine_code_num, record.desc);
     }
