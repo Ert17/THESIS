@@ -135,7 +135,7 @@ if __name__ == "__main__":
     valid = True
 
     while (valid):
-        choice = int(input("Choices: 1. Create Request   2. Invoke/Revoke Permission  3. Retrieve a Record   4. Create Notification   5. Exit> "))
+        choice = int(input("Choices: 1. Create Request   2. Invoke/Revoke Permission  3. Retrieve a Record   4. View Notification   5. Exit> "))
 
         if choice == 1:
             # get inputs : recipientWallet, recordID, accesscode
@@ -288,7 +288,7 @@ if __name__ == "__main__":
             #         Patient ID: {}   Patient Name: {}   Gender: {}\n
             #         Vaccine Code: {}    Description: {}').format(recordID, date, patientID, patientName, gender, vacc_code, description)
 
-        elif choice == 4: # Create Notification
+        elif choice == 4: # View Notification
             notif = contracts.functions.createNotif(reqResult[1]).call()
 
             if notif[2] == 'Read Access':
