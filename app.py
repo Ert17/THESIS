@@ -135,7 +135,7 @@ if __name__ == "__main__":
     valid = True
 
     while (valid):
-        choice = int(input("Choices: 1. Create Request   2. Invoke/Revoke Permission  3. Retrieve a Record  4. Exit> "))
+        choice = int(input("Choices: 1. Create Request   2. Invoke/Revoke Permission  3. Retrieve a Record   4. Create Notification   5. Exit> "))
 
         if choice == 1:
             # get inputs : recipientWallet, recordID, accesscode
@@ -269,10 +269,10 @@ if __name__ == "__main__":
             if verified == 0: # if user has no permission to access record
                 print ("Request rejected: User is not permitted to access said record.")
 
-            elif verified == 1: # if OWNER of recor
+            elif verified == 1: # if OWNER of record
                 Record = contracts.functions.pullRecord(recordID).call()
 
-                print ('Record ID: {}   Date: {}'.format(Record[0], Record[1]))
+                print('Record ID: {}   Date: {}'.format(Record[0], Record[1]))
                 print('Patient ID: {}   Patient Name: {}   Gender: {}'.format(Record[2], Record[3], Record[4]))
                 print('Vaccine Code: {}    Description: {}'.format(Record[5], Record[6]))
 
@@ -288,6 +288,15 @@ if __name__ == "__main__":
             #         Patient ID: {}   Patient Name: {}   Gender: {}\n
             #         Vaccine Code: {}    Description: {}').format(recordID, date, patientID, patientName, gender, vacc_code, description)
 
-        elif choice == 4: # Exit
+        elif choice == 4: # Create Notification
+            notif = contracts.functions.createNotif(reqResult[1]).call()
+
+            if notif[2] == 'Read Access':
+                print('A record has been shared and access permission is granted.\n')
+                print('Access ID: {}\nRecipient: {}\nAccess Permission: {}\nKey ID: {}'.format(notif[0], notif[1], notif[2], notif[3]))
+            else:
+                print('No record has been shared. :\'(')
+
+        elif choice == 5: # Exit
             p.dump(keys, open('/Users/earth/Downloads/THESIS/app_keys/keys.rtf','wb'))
             valid = False
