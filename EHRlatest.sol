@@ -250,10 +250,16 @@ contract EHR{
         return (0, 0, 0x0000000000000000000000000000000000000000, 0);
     }
 
-    function createNotif(uint accessID) public view returns (uint, address, string memory, string memory) {
+    function createNotif(address recipient, uint recordID) public view returns (uint, address, string memory, string memory) {
 
         // retrieve the current access permission
-        Permission memory OAP = permissions[accessID];
+        int256 accessID = get_OAP_index(recipient, recordID);
+
+        if(accessID == -1) {
+            return (0, 0x0000000000000000000000000000000000000000, "Drop", "");
+        }
+
+        Permission memory OAP = permissions[uint(accessID)];
 
         // retrieve access permission info if there is read access
         if(keccak256(abi.encodePacked(OAP.access)) == keccak256(abi.encodePacked("R"))) {
