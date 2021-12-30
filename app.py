@@ -9,6 +9,7 @@ from web3 import Web3
 from Crypto.Cipher import AES, DES3, Blowfish
 from secrets import token_bytes
 from Crypto.Random import get_random_bytes
+from struct import pack
 import pickle as p
 import random
 
@@ -96,35 +97,6 @@ if __name__ == "__main__":
         print(keys)
     except:
         pass
-
-    # # key generations - 192-bit and 24 bytes
-    # # AES key generation
-    # AES_key = token_bytes(32)
-    # print("AES Key Generated: " + str(AES_key))
-    # print("Key converted to hex: " + str(web3.toHex(AES_key)))
-    # cipher = AES.new(AES_key, AES.MODE_EAX) # not totally sure ano ginagawa
-    # print("Cipher: " + str(cipher))
-    # temp = "Plain Text"
-    # encrypt_data, tag = cipher.encrypt_and_digest(temp)
-    # print("Plain: " + temp)
-    # print("Encrypted: " + str(encrypt_data))
-    # decrypt_data = cipher.decrypt(encrypt_data)
-    # print(decrypt_data)
-
-    # AES_key = token_bytes(32)
-    # print("AES Key Generated: " + str(AES_key))
-    # #                   v - computed
-    #
-    # cipher1 = AES.new(token_bytes(24), AES.MODE_EAX)
-    # nonce = cipher1.nonce
-    # file = b'Earth Lopez'
-    # print("File before encryption: " + str(web3.toHex(file)))
-    # encrypted_data = cipher1.encrypt(file)
-    # print ("Encrypted data: " + str(web3.toHex(encrypted_data)))
-    #
-    # cipher2 = AES.new(b'}.\x86\x12F\xbf\xd4Dfc~\xe3U\xe9\xbf(\xe2\x1b\xaf\xef)a\xa36\xd5n1\xd1\x9f\xfd\xf8\x10', AES.MODE_EAX, nonce=nonce)
-    # decrypted_data = cipher2.decrypt(encrypted_data)
-    # print ("Decrypted data: " + str(web3.toHex(decrypted_data)))
 
     valid = True
     logged = True
@@ -269,17 +241,75 @@ if __name__ == "__main__":
                     print('Patient ID: {}   Patient Name: {}   Gender: {}'.format(Record[2], Record[3], Record[4]))
                     print('Vaccine Code: {}    Description: {}'.format(Record[5], Record[6]))
 
-                # elif verified == 2: # if RECIPIENT with access to record
-                #     recordID, date, patientID, patientName, gender, vacc_code, description = contracts.functions.pullRecord(recordID).transact()
-                #
-                #     # key = contracts.functions.getKey(reqResult[2], reqResult[3]).transact()
-                #     # call to encrypt (function)
-                #     # display encrypted record
-                #     # getDecryptkey; key = contracts.functions.getKey(reqResult[2], reqResult[3]).transact()?
-                #     # call to decrypt (function)
-                #     print ('Record ID: {}   Date: {}\n
-                #         Patient ID: {}   Patient Name: {}   Gender: {}\n
-                #         Vaccine Code: {}    Description: {}').format(recordID, date, patientID, patientName, gender, vacc_code, description)
+                elif verified == 2: # if RECIPIENT with access to record
+                    Record = contracts.functions.pullRecord(recordID).call()
+                    Record_values = str(Record[0]) + "\n" + str(Record[0]) + "\n" + str(Record[1]) + "\n" + str(Record[2]) + "\n" + str(Record[3]) + "\n" + str(Record[4]) + "\n" + str(Record[5]) + "\n" + str(Record[6])
+                    encoded_record = Record_values.encode("windows-1252").strip()
+                    Record_byte = bytes(encoded_record)
+                    print(Record_byte)
+
+                    keyID = contracts.functions.getKey(currentAcct, recordID).call()
+                    key = keys.get(keyID)
+
+                    # Encrypt Record
+                    if(chosenAlgorithm == "AES"): #AES
+                        cipher1 = AES.new(key, AES.MODE_EAX)
+                        nonce = cipher1.nonce
+                        print("Record before encryption: " + str(Record))    # debugging
+                        encrypt_record = cipher1.encrypt(Record_byte)
+                        print("Encrypted record: " + str(encrypt_record))
+
+                    elif(chosenAlgorithm == "3DES"): #3DES
+                        cipher1 = DES3.new(key, DES3.MODE_CFB)
+                        #nonce = cipher1.nonce
+                        print("Record before encryption: " + str(Record))    # debugging
+                        encrypt_record = cipher1.iv + cipher1.encrypt(Record_byte)
+                        print("Encrypted record: " + str(encrypt_record))
+
+                    elif(chosenAlgorithm == "Blowfish"): #Blowfish
+                        cipher1 = Blowfish.new(key, Blowfish.MODE_CBC)
+                        #nonce = cipher1.nonce
+
+                        block_size = 24
+                        plen = block_size - len(Record_byte) % block_size
+                        padding = [plen]*plen
+                        padding = pack('b'*plen, *padding)
+
+                        print("Record before encryption: " + str(Record))    # debugging
+                        encrypt_record = cipher1.iv + cipher1.encrypt(Record_byte + padding)
+                        print("Encrypted record: " + str(encrypt_record))
+
+                    KeyIndex = contracts.functions.getKey(currentAcct, recordID).call()
+                    decrypt_key_checker = keys.get(KeyIndex)
+
+                    decrypt_key = input("Input decryption key: ")
+                    decrypt_bytes = str('b\'') + decrypt_key + str('\'')
+
+
+                    # Check if user provided key is same sa one in key storage
+                    if str(decrypt_key_checker) == str(decrypt_bytes):
+                        if(chosenAlgorithm == "AES"): #AES
+                            cipher2 = AES.new(decrypt_key_checker, AES.MODE_EAX, nonce=nonce)
+                            decrypted_data = cipher2.decrypt(encrypt_record)
+                            print ("Decrypted data: " + str(decrypted_data))
+                        elif(chosenAlgorithm == "3DES"): #3DES
+                            cipher2 = DES3.new(decrypt_key_checker, DES3.MODE_CFB)
+                            decrypted_data = cipher2.decrypt(encrypt_record)
+                            print ("Decrypted data: " + str(decrypted_data))
+                        elif(chosenAlgorithm == "Blowfish"): #Blowfish
+                            cipher2 = Blowfish.new(decrypt_key_checker, Blowfish.MODE_CBC)
+                            decrypted_data = cipher2.decrypt(encrypt_record)
+                            print ("Decrypted data: " + str(decrypted_data))
+
+                        dec_data = decrypted_data.decode("windows-1252")
+                        #print(dec_data)
+                        Record = dec_data.split('\n')
+
+                        print('Record ID: {}   Date: {}'.format(Record[1], Record[2]))
+                        print('Patient ID: {}   Patient Name: {}   Gender: {}'.format(Record[3], Record[4], Record[5]))
+                        print('Vaccine Code: {}    Description: {}'.format(Record[6], Record[7]))
+                    else:
+                        print("Invalid key: The record you requested cannot be decrypted.")
 
             elif choice == 4: # View Notification for a record
                 # should be executed when user(recipient) is 'logged in'
