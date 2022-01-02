@@ -10,7 +10,7 @@ contract EHR{
     uint userCtr = 0;
 
     // algorithm set to AES as defualt
-    string algorithm = "AES"; // 0 -> AES; 1 -> 3DES; 2 -> Twofish/Blowfish
+    uint algorithm = 0; // 0 -> AES; 1 -> 3DES; 2 -> Twofish/Blowfish
 
     //patient record EHR
     struct Record {
@@ -53,17 +53,13 @@ contract EHR{
     // wallet address used as primary key
     mapping(address => User) users;
 
-    constructor() public {
-        initialize();
-    }
-
-    function initialize() internal {
+    constructor(uint chosenAlgo) {
         owners.push(Permission(accessCtr, 0x0000000000000000000000000000000000000000, recordCtr, "", ""));
         permissions.push(Permission(accessCtr, 0x0000000000000000000000000000000000000000, recordCtr, "", ""));
-    }
 
-    function setAlgo(string memory algo) public {
-      algorithm = algo;
+        if(chosenAlgo >= 0 && chosenAlgo < 4) {
+            algorithm = chosenAlgo;
+        }
     }
 
     //function for pushing records
@@ -174,7 +170,7 @@ contract EHR{
 
     }
 
-    function invoke_Permission(uint accessID, address recipient, uint recordID) public {
+    function invoke_Permission(uint accessID, address recipient, uint recordID) internal {
 
         // generate key
 
@@ -182,7 +178,7 @@ contract EHR{
         permissions.push(Permission(accessID, recipient, recordID, "R", ""));
     }
 
-    function revoke_Permission(uint accessID, address recipient, uint recordID) public {
+    function revoke_Permission(uint accessID, address recipient, uint recordID) internal {
 
         // invalidate key in the latest R access permission
         uint invalidate_index = uint(get_OAP_index(recipient, recordID));
@@ -198,8 +194,13 @@ contract EHR{
 
         if(OAP_index == -1) { // no existing access permission yet
 
-            return (1, request.accessID, request.recipient, request.recordID); //invoke_Permission(request); // return 1
+            if(keccak256(abi.encodePacked(request.access)) == keccak256(abi.encodePacked("R"))) {
+                invoke_Permission(request.accessID, request.recipient, request.recordID);
+                return (1, request.accessID, request.recipient, request.recordID); //invoke_Permission(request); // return 1
+            }
 
+            accessCtr -= 1;
+            return (3, 0, 0x0000000000000000000000000000000000000000, 0);
         }
 
         // with existing access permission
@@ -214,12 +215,17 @@ contract EHR{
         // if different access change to the latest access permission, push the request as a new permission
 
         if(keccak256(abi.encodePacked(request.access)) == keccak256(abi.encodePacked("R"))) {
+
+            invoke_Permission(request.accessID, request.recipient, request.recordID);
             return (1, request.accessID, request.recipient, request.recordID);//invoke_Permission(request);
         }
         else if(keccak256(abi.encodePacked(request.access)) == keccak256(abi.encodePacked("N"))) {
+
+            revoke_Permission(request.accessID, request.recipient, request.recordID);
             return (2, request.accessID, request.recipient, request.recordID);//revoke_Permission(request);
         }
 
+        accessCtr -= 1;
         return (3, 0, 0x0000000000000000000000000000000000000000, 0);
     }
 
@@ -227,6 +233,11 @@ contract EHR{
     function createReq(address ownerWallet, address recipientWallet, uint record_id, string memory access_code) public returns (uint, uint, address, uint){
 
         bool isUser = checkUser(recipientWallet);
+
+        if(ownerWallet == recipientWallet) {
+            // if shared to self
+            return (0, 0, 0x0000000000000000000000000000000000000000, 0);
+        }
 
         // msg.sender pertaining to account currently calling the function
         if(verifyOwner(ownerWallet, record_id)) { // if requestor is owner
@@ -344,12 +355,16 @@ contract EHR{
         return (user.myAddress, user.role);
     }
 
-    function getAlgo() public view returns (string memory) {
+    function getAlgo() public view returns (uint) {
 
         return algorithm;
     }
 
     function getKey(address recipient, uint recordID) public view returns (string memory) {
+
+        if(get_OAP_index(recipient, recordID) == -1) {
+            return "NoKey";
+        }
 
         uint index = uint(get_OAP_index(recipient, recordID));
 
