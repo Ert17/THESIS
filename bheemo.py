@@ -35,7 +35,7 @@ Needed Functionalities:
 # Initialize everything
 def initialize():
     global contracts
-    global web3 
+    global web3
     # Setting up web3 connection with Ganache
     ganache_url = "http://127.0.0.1:7545"
     web3 = Web3(Web3.HTTPProvider(ganache_url))
@@ -44,11 +44,10 @@ def initialize():
     ''' ---------------------------------------------------------------------------------- '''
 
     # Python representation of the smart contract; changes upon changing parameters, present variables(?), etc.;
-    abi = json.loads('[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"checkUser","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"}],"name":"createNotif","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"ownerWallet","type":"address"},{"internalType":"address","name":"recipientWallet","type":"address"},{"internalType":"uint256","name":"record_id","type":"uint256"},{"internalType":"string","name":"access_code","type":"string"}],"name":"createReq","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAlgo","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"getKey","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"get_current_acct","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"walletAddress","type":"address"},{"internalType":"string","name":"userRole","type":"string"}],"name":"insertUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"rDate","type":"string"},{"internalType":"string","name":"birthday","type":"string"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"_gender","type":"string"},{"internalType":"string","name":"hAddress","type":"string"},{"internalType":"string","name":"_city","type":"string"},{"internalType":"uint256","name":"code","type":"uint256"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"bCost","type":"string"},{"internalType":"string","name":"_expense","type":"string"},{"internalType":"string","name":"_coverage","type":"string"}],"name":"insert_record","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"}],"name":"invalidateKey","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"invoke_Permission","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"record_id","type":"uint256"}],"name":"pullRecord","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"address","name":"","type":"address"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"retrieve_owner","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"retrieve_permission","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"retrieve_user","outputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"revoke_Permission","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"withAccess","type":"address"}],"name":"searchNotif","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"algo","type":"string"}],"name":"setAlgo","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"},{"internalType":"string","name":"generated_key","type":"string"}],"name":"storeKey","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"verify_AP","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]')
-
+    abi = json.loads('[{"inputs":[],"stateMutability":"nonpayable","type":"constructor"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"checkUser","outputs":[{"internalType":"bool","name":"","type":"bool"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"}],"name":"createNotif","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"ownerWallet","type":"address"},{"internalType":"address","name":"recipientWallet","type":"address"},{"internalType":"uint256","name":"record_id","type":"uint256"},{"internalType":"string","name":"access_code","type":"string"}],"name":"createReq","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[],"name":"getAlgo","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"getKey","outputs":[{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"get_current_acct","outputs":[{"internalType":"address","name":"","type":"address"}],"stateMutability":"view","type":"function"},{"inputs":[],"name":"get_current_record_count","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"walletAddress","type":"address"},{"internalType":"string","name":"userRole","type":"string"}],"name":"insertUser","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"string","name":"rDate","type":"string"},{"internalType":"string","name":"birthday","type":"string"},{"internalType":"string","name":"name","type":"string"},{"internalType":"string","name":"_gender","type":"string"},{"internalType":"string","name":"hAddress","type":"string"},{"internalType":"string","name":"_city","type":"string"},{"internalType":"uint256","name":"code","type":"uint256"},{"internalType":"string","name":"description","type":"string"},{"internalType":"string","name":"bCost","type":"string"},{"internalType":"string","name":"_expense","type":"string"},{"internalType":"string","name":"_coverage","type":"string"}],"name":"insert_record","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"}],"name":"invalidateKey","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"invoke_Permission","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"record_id","type":"uint256"}],"name":"pullRecord","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"address","name":"","type":"address"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"retrieve_owner","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"index","type":"uint256"}],"name":"retrieve_permission","outputs":[{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"address","name":"","type":"address"},{"internalType":"uint256","name":"","type":"uint256"},{"internalType":"string","name":"","type":"string"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"address","name":"userAddress","type":"address"}],"name":"retrieve_user","outputs":[{"internalType":"address","name":"","type":"address"},{"internalType":"string","name":"","type":"string"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"},{"internalType":"address","name":"recipient","type":"address"},{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"revoke_Permission","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"address","name":"withAccess","type":"address"}],"name":"searchNotif","outputs":[{"internalType":"uint256[]","name":"","type":"uint256[]"}],"stateMutability":"view","type":"function"},{"inputs":[{"internalType":"string","name":"algo","type":"string"}],"name":"setAlgo","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"accessID","type":"uint256"},{"internalType":"string","name":"generated_key","type":"string"}],"name":"storeKey","outputs":[],"stateMutability":"nonpayable","type":"function"},{"inputs":[{"internalType":"uint256","name":"recordID","type":"uint256"}],"name":"verify_AP","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]')
 
     # Address of deployed contract in Remix
-    address = web3.toChecksumAddress('0x3b15e47250e380C4BD473f248ccAd91349962099') # changes per deployment
+    address = web3.toChecksumAddress('0x96710590e646aCDCC347848b1D8db0999B21C47B') # changes per deployment
     contracts = web3.eth.contract(address=address, abi=abi)
     chosenAlgorithm = getAlgoCode(contracts)
 
@@ -98,14 +97,15 @@ def addUser(address, userRole):
 def insertRecord(date, birthday, name, gender, homeAddress, city, code, desc, bCost, expense, coverage):
     global contracts
     tx_hash = contracts.functions.insert_record(date, birthday, name, gender, homeAddress, city, code, desc, bCost, expense, coverage).transact()
+    recordID = contracts.functions.get_current_record_count().call()
 
-    #return tx_hash (which should be record_id?)
+    return recordID
 
 # Modify record permissions and create/delete keys
-def modifyRecordPermission(ownerAddress, recipientAddress, recordID, accessCode, accessID):
+def modifyRecordPermission(ownerAddress, recipientAddress, recordID, accessCode, keys):
     global contracts
     getKeyIndex = None
-    if accesscode == 'N':
+    if accessCode == 'N':
         getKeyIndex = contracts.functions.getKey(recipientAddress, recordID).call()
 
     reqResult = contracts.functions.createReq(str(ownerAddress), str(recipientAddress), recordID, str(accessCode)).call()
@@ -130,8 +130,7 @@ def modifyRecordPermission(ownerAddress, recipientAddress, recordID, accessCode,
     elif reqResult[0] == 3:
         print("\nInvalid Request for Access Permission.")
 
-    tx_hash = contracts.functions.createReq(str(ownerAddress), str(recipientAddress), recordID, str(accesscode)).transact()
-
+    tx_hash = contracts.functions.createReq(str(ownerAddress), str(recipientAddress), recordID, str(accessCode)).transact()
 
     if reqResult[0] == 1: #reqResult(0) == 1
         # get inputs: accessID, recipientAddress, record ID
@@ -189,9 +188,20 @@ def modifyRecordPermission(ownerAddress, recipientAddress, recordID, accessCode,
                     print("\nKey ID inserted is: " + str(keyID))
                     implemented = True
 
-        keyStoreResult = contracts.functions.storeKey(reqResult[1], str(keyID)).transact()
-        print("Transaction Hash: " + str(web3.toHex(keyStoreResult)))        # Debugging
-        print("(Checking purpose only): \nAll current keys: " + str(keys))   # Debugging
+        print(reqResult)
+        contracts.functions.storeKey(reqResult[1], str(keyID)).transact()
+        notif = contracts.functions.createNotif(ownerAddress, recordID).call()
+        reply = []
+        reply.append(notif[0])
+        reply.append(notif[1])
+        reply.append(notif[2])
+        reply.append(notif[3])
+        reply.append(keys[str(keyID)])
+
+        return reply
+
+        #print("Transaction Hash: " + str(web3.toHex(keyStoreResult)))        # Debugging
+        #print("(Checking purpose only): \nAll current keys: " + str(keys))   # Debugging
 
     elif reqResult[0] == 2:
         # remove from key storage
@@ -205,15 +215,14 @@ def modifyRecordPermission(ownerAddress, recipientAddress, recordID, accessCode,
         # Debugging: print
         print("(Checking purpose only): \nRemaining keys after removing and invalidating specified key: " + str(keys))
 
-    notif = contracts.functions.createNotif(ownerAddress, recordID).call()
-    reply = []
-    reply.append(notif[0])
-    reply.append(notif[1])
-    reply.append(notif[2])
-    reply.append(notif[3])
-    reply.append(keys[str(keyID)])
-    return reply
+        notif = contracts.functions.createNotif(ownerAddress, recordID).call()
+        reply = []
+        reply.append(notif[0])
+        reply.append(notif[1])
+        reply.append(notif[2])
+        reply.append(notif[3])
 
+        return reply
 # Retrieve a record for a recipient
 def recipientRetrieve(address, keys, privateKey, recordID):
     global contracts
@@ -306,7 +315,7 @@ def retrieveRecord(address, recordID): #added address
         print("Invalid input.\n")
 
 
-    verified = contracts.functions.verify_AP(address, recordID).call()
+    verified = contracts.functions.verify_AP(recordID).call()
     print("\nAccess Permission Value: " + str(verified))    #Debugging
 
     if verified == 0: # if user has no permission to access record

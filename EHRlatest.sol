@@ -370,4 +370,9 @@ contract EHR{
         return msg.sender;
     }
 
+    function get_current_record_count() public view returns (uint) {
+
+        return recordCtr;
+    }
+
 }
