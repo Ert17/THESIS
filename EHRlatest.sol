@@ -275,9 +275,9 @@ contract EHR{
         return (0, 0x0000000000000000000000000000000000000000, "Drop", "");
     }
 
-    function searchNotif(address withAccess) public view returns (uint[] memory) {
+    function searchNotif(address withAccess) public view returns (uint) {
 
-        uint[] memory notifs;
+        uint notifs;
 
         // traverse from last element in permissions
         for(uint i = permissions.length-1; i > 0; i--) {
@@ -285,7 +285,8 @@ contract EHR{
             //find the latest instance of an access permission given a recipient address and record id
             if(permissions[i].recipient == withAccess && keccak256(abi.encodePacked(permissions[i].access)) == keccak256(abi.encodePacked("R"))) {
                 uint accesscode = permissions[i].accessID;
-                notifs[i] = accesscode;
+                notifs = accesscode;
+                break; // remove this after test
             }
         }
 

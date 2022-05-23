@@ -93,20 +93,32 @@ def userfunc(keys):
 
             valid = False
             accessCode = 0
+            permission = ''
 
             while valid == False:
                 try:
                     accessCode = int (input ('[1] Invoke Access Permission\n[2] Revoke Access Permission\nInput: '))
-                    if accessCode == 1 or accessCode == 2:
+                    if accessCode == 1:
+                        permission = 'R'
+                        valid = True
+                    elif accessCode == 2:
+                        permission = 'N'
                         valid = True
                 except:
                     print('Invalid Input sa accessCode')
 
-            reqResult = bheemo.modifyRecordPermission(ownerWallet, recipientWallet, recordID, accessCode, keys)
+            reqResult = bheemo.modifyRecordPermission(ownerWallet, recipientWallet, recordID, permission, keys)
             #reqResult is an array
+            # if invoke, 6 laman ni reqResult
+            # if revoke, 4 laman ni reqResult
 
             print ('Modification successful.\n')
-            print ('Key ID: ' + reqResult[4])
+
+            if permission == 'R':
+                print ('Key ID: ' + str(reqResult[4]))
+
+            bheemo.loadKeys()
+
 
         elif choice == 3:
             ownerWallet = currentAcct
@@ -119,6 +131,12 @@ def userfunc(keys):
 
         elif choice == 4:
             notifList = bheemo.listNotification(currentAcct)
+            print("\nNOTIFS TO")
+            print(notifList)
+
+            #print("\nNOTIFS TO\n")
+            #for notif in notifList:
+            #    print(bheemo.viewNotification(notif))
 
             valid = False
             view = 0
@@ -166,6 +184,7 @@ def userfunc(keys):
 def main ():
     bheemo.initialize()
     keys = bheemo.loadKeys()
+    print(keys)
 
     opt = 0
     while (opt is not 3):
@@ -212,8 +231,6 @@ def main ():
                 bheemo.addUser(activeUser, desc)
             else:
                 print ("Log-in failed. Address is taken.")
-
-
 
 if __name__ == '__main__':
     main()
