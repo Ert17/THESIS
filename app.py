@@ -16,7 +16,7 @@ import bheemo
 
 ''' =============================== WEB3 <-----------> GANACHE =============================== '''
 # Setting up web3 connection with Ganache
-ganache_url = "http://127.0.0.1:7545"
+ganache_url = "http://127.0.0.1:8545"
 web3 = Web3(Web3.HTTPProvider(ganache_url))
 
 web3.eth.defaultAccount = web3.eth.accounts[0]
@@ -109,7 +109,7 @@ if __name__ == "__main__":
         while(logged):
             try:
                 try:
-                    choice = int(input("\nChoices: 1. Create Request   2. Retrieve a Record   3. View Notification   4. Logout    5. Logout and Exit> "))
+                    choice = int(input("\nChoices: 1. Create Request   2. Retrieve a Record   3. View Current Permissions   4. Logout    5. Logout and Exit> "))
                 except:
                     print("Invalid input.\n")
                     continue
@@ -336,18 +336,14 @@ if __name__ == "__main__":
                             print("Oops something went wrong. Possible decryption failure.\n")
                             continue
 
-                elif choice == 3: # View Notification for a record
+                elif choice == 3: # View Current Permissions
                     currentAcct = get_currentAcct(contracts)
                     print("\nCurrent Account: " + str(currentAcct))
 
-                    try:
-                        recordID = int(input("\nInput recordID to check notification: "))
-                    except:
-                        print("\nInvalid Input.")
-                        continue
+                    read_access = listCurrentPermission(currentAcct)
 
-                    notif = contracts.functions.createNotif(currentAcct, recordID).call()
-
+                    for i in read_access:
+                        print(i)
 
                     if notif[2] == 'Read Access':
                         print("\n")

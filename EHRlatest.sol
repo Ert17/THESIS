@@ -57,11 +57,13 @@ contract EHR{
         initialize();
     }
 
+    // initializes structure arrays
     function initialize() internal {
         owners.push(Permission(accessCtr, 0x0000000000000000000000000000000000000000, recordCtr, "", ""));
         permissions.push(Permission(accessCtr, 0x0000000000000000000000000000000000000000, recordCtr, "", ""));
     }
 
+    // sets the encryption and decryption algorithm
     function setAlgo(string memory algo) public {
       algorithm = algo;
     }
@@ -160,6 +162,7 @@ contract EHR{
         return verifiedOwner;
     }
 
+    // function to store key identifier in permissions
     function storeKey(uint accessID, string memory generated_key) public {
 
         // use provided algorithm to generate key for the specified record
@@ -168,6 +171,7 @@ contract EHR{
         permissions[accessID].key = generated_key;
     }
 
+    // function to remove key identifier in previous read access permission
     function invalidateKey(uint accessID) public {
 
 
@@ -176,6 +180,7 @@ contract EHR{
 
     }
 
+    // creates (R)ead permission
     function invoke_Permission(uint accessID, address recipient, uint recordID) public {
 
         // generate key
@@ -184,6 +189,7 @@ contract EHR{
         permissions.push(Permission(accessID, recipient, recordID, "R", ""));
     }
 
+    //// creates (N)o Access permission
     function revoke_Permission(uint accessID, address recipient, uint recordID) public {
 
         // invalidate key in the latest R access permission
@@ -252,6 +258,7 @@ contract EHR{
         return (0, 0, 0x0000000000000000000000000000000000000000, 0);
     }
 
+    // function that formats the notification
     function createNotif(uint accessID) public view returns (uint, address, string memory, string memory) {
 
         // retrieve the current access permission
@@ -275,22 +282,41 @@ contract EHR{
         return (0, 0x0000000000000000000000000000000000000000, "Drop", "");
     }
 
-    function searchNotif(address withAccess) public view returns (uint) {
+    // function that counts existing permissions for specified address
+    function countNotif(address withAccess) internal view returns (uint) {
 
-        uint notifs;
+        uint ctr = 0;
 
+        for(uint i = permissions.length-1; i > 0; i--) {
+
+            //find the latest instance of an access permission given a recipient address and record id
+            if(permissions[i].recipient == withAccess) {
+                ctr++;
+            }
+        }
+
+        return ctr;
+
+    }
+
+    // function that returns access IDs for the specified address; count is retrieved from countNotif function
+    function searchNotif(address withAccess) public view returns (uint[] memory) {
+
+        uint count = countNotif(withAccess);
+        uint[] memory notifs = new uint[](count);
+        uint ctr = 0;
         // traverse from last element in permissions
         for(uint i = permissions.length-1; i > 0; i--) {
 
             //find the latest instance of an access permission given a recipient address and record id
-            if(permissions[i].recipient == withAccess && keccak256(abi.encodePacked(permissions[i].access)) == keccak256(abi.encodePacked("R"))) {
-                uint accesscode = permissions[i].accessID;
-                notifs = accesscode;
-                break; // remove this after test
+            if(permissions[i].recipient == withAccess) {
+                //uint accesscode = permissions[i].accessID;
+                notifs[ctr] = permissions[i].accessID;
+                ctr++;
             }
         }
 
-        return notifs;
+        return notifs; // return last index found
     }
 
     // This function verifies updated access permission for record retrieval
@@ -329,6 +355,7 @@ contract EHR{
 
     }
 
+    // function to retrieve record
     function pullRecord(uint record_id) public view returns
     (uint, string memory, address, string memory, string memory, uint, string memory) {
         Record storage record = records[record_id];
@@ -336,29 +363,34 @@ contract EHR{
         return (record.record_id, record.record_date, record.patient_id, record.patient_name, record.gender, record.vaccine_code_num, record.desc);
     }
 
+    // function to retrieve permission
     function retrieve_permission(uint index) public view returns (uint, address, uint, string memory, string memory) {
         Permission storage permission = permissions[index];
 
         return (permission.accessID, permission.recipient, permission.recordID, permission.access, permission.key);
     }
 
+    // function to retrieve record owner
     function retrieve_owner(uint index) public view returns (uint, address, uint, string memory, string memory) {
         Permission storage owner = owners[index];
 
         return (owner.accessID, owner.recipient, owner.recordID, owner.access, owner.key);
     }
 
+    // function to retrieve user
     function retrieve_user(address userAddress) public view returns (address, string memory) {
         User storage user = users[userAddress];
 
         return (user.myAddress, user.role);
     }
 
+    // function to retrieve algorithm
     function getAlgo() public view returns (string memory) {
 
         return algorithm;
     }
 
+    // function to retrieve key identifier
     function getKey(address recipient, uint recordID) public view returns (string memory) {
 
         uint index = uint(get_OAP_index(recipient, recordID));
@@ -366,11 +398,13 @@ contract EHR{
         return permissions[index].key;
     }
 
+    // function to retrieve current account
     function get_current_acct() public view returns (address) {
 
         return msg.sender;
     }
 
+    // function to retrieve current record count
     function get_current_record_count() public view returns (uint) {
 
         return recordCtr;
