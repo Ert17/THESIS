@@ -60,7 +60,7 @@ def userfunc(keys):
 
     currentAcct = bheemo.getCurrentAcct()
     while (logged):
-        print('[1] Create a Record\n[2] Modify Record Permission\n[3] Retrieve a Record\n[4] View Notifications\n[5] Logout\n\n')
+        print('[1] Create a Record\n[2] Modify Record Permission\n[3] Retrieve a Record\n[4] View Current Permissions\n[5] Logout\n\n')
         #try:
         choice = int(input('Input Action: '))
 
@@ -122,59 +122,28 @@ def userfunc(keys):
 
         elif choice == 3:
             ownerWallet = currentAcct
+            
+            user = int(input('[1] Owner\n[2] Recipient\nInput: '))
+            
             recordID = int (input ('Enter record ID: '))
-            privKey = (input ('Enter private key (if owner, leave blank): '))
-
-            record = bheemo.retrieveRecord(ownerWallet, recordID)
-            print(record)
+            
+            if user == 2:
+                privKey = (input ('Enter private key: '))
+                record = bheemo.recipientRetrieve(ownerWallet, keys, privKey, recordID)
+            else:
+                record = bheemo.retrieveRecord(ownerWallet, recordID)
+            
+            print('\n' + str(record))
 
 
         elif choice == 4:
-            notifList = bheemo.listNotification(currentAcct)
+            notifList = bheemo.listCurrentPermissions(currentAcct)
             print("\nNOTIFS TO")
-            print(notifList)
-
-            #print("\nNOTIFS TO\n")
-            #for notif in notifList:
-            #    print(bheemo.viewNotification(notif))
-
-            valid = False
-            view = 0
-
-            while valid == False:
-                try:
-                    view = int(input('[1] Yes\n[2] No\n Proceed to view a notification? '))
-                except:
-                    print('Invalid Input sa notification proceed')
-
-                if view == 1 or view == 2:
-                    valid = True
-
-            if view == 1:
-                accessID = -1
-                included = False
-
-                while included == False:
-                    try:
-                        accessID = int(input('Input access ID of notification to view: '))
-                    except:
-                        print('Invalid Input sa notif viewing')
-
-                    if accessID in notiflist:
-                        included = True
-                    else:
-                        print('No existing notification with access ID: ' + str(accessID))
-
-                content = bheemo.viewNotification(accessID)
-                print("\n")
-                print('A record has been shared and access permission is granted.\n')
-                print('Access ID: {}\nRecipient: {}\nAccess Permission: {}\nKey ID: {}'.format(content[0], content[1], content[2], content[3]))
-
-            elif view == 2:
-                print('Loop here')
-            else:
-                print('Invalid input')
-
+            #print(notifList)
+            
+            for notif in notifList:
+            	print('Access ID: {}\nRecord ID: {}\nKey ID: {}\n'.format(notif[0], notif[1], notif[2]))
+            	
         elif choice == 5:
             logged = False
 
