@@ -70,7 +70,7 @@ def loadKeys():
     keys = {}
     # Loading existing key 'storage' to keys dictionary
     try:
-        keys = p.load(open('/Users/earth/Downloads/THESIS/app_keys/keys.rtf','rb'))
+        keys = p.load(open('app_keys/keys.rtf','rb'))
     except:
         pass
 
@@ -78,7 +78,7 @@ def loadKeys():
 
 # Save keys
 def saveKeys(keys):
-    p.dump(keys, open('/Users/earth/Downloads/THESIS/app_keys/keys.rtf','wb'))
+    p.dump(keys, open('app_keys/keys.rtf','wb'))
 
 # Determine index of given valid address from Ganache list
 def setUser(address):
@@ -238,6 +238,8 @@ def modifyRecordPermission(ownerAddress, recipientAddress, recordID, accessCode,
         # Debugging: print
         print("(Checking purpose only): \nRemaining keys after removing and invalidating specified key: " + str(keys))
 
+        accessID = reqResult[1]
+
         notif = contracts.functions.createNotif(accessID).call()
         reply = []
         reply.append(notif[0])
@@ -255,6 +257,7 @@ def recipientRetrieve(address, keys, privateKey, recordID):
 
     verified = contracts.functions.verify_AP(recordID).call()
     print("\nAccess Permission Value: " + str(verified))
+    #0 1 2
 
     if verified == 0: # if user has no permission to access record
         return "Invalid Request."
@@ -275,14 +278,14 @@ def recipientRetrieve(address, keys, privateKey, recordID):
             nonce = cipher1.nonce
             #print("Record before encryption: " + str(Record))    # Debugging
             encrypt_record = cipher1.encrypt(record_byte)
-            print("\nEncrypted record: " + str(encrypt_record))
+            print("\nEncrypted record: " + str(encrypt_record) + '\n')
 
         elif(chosenAlgorithm == 1): #3DES
             cipher1 = DES3.new(key, DES3.MODE_CFB)
             #nonce = cipher1.nonce
             #print("Record before encryption: " + str(Record))    # Debugging
             encrypt_record = cipher1.iv + cipher1.encrypt(record_byte)
-            print("\nEncrypted record: " + str(encrypt_record))
+            print("\nEncrypted record: " + str(encrypt_record) + '\n')
 
         elif(chosenAlgorithm == 2): #Blowfish
             cipher1 = Blowfish.new(key, Blowfish.MODE_CBC)
@@ -295,7 +298,7 @@ def recipientRetrieve(address, keys, privateKey, recordID):
 
             #print("Record before encryption: " + str(Record))    # debugging
             encrypt_record = cipher1.iv + cipher1.encrypt(record_byte + padding)
-            print("\nEncrypted record: " + str(encrypt_record))
+            print("\nEncrypted record: " + str(encrypt_record) + '\n')
 
         keyIndex = contracts.functions.getKey(address, recordID).call()
         decrypt_key_checker = keys.get(keyIndex)
@@ -332,10 +335,10 @@ def recipientRetrieve(address, keys, privateKey, recordID):
 # Retrieve a record for owner
 def retrieveRecord(address, recordID): #added address
     global contracts
-    try:
-        recordID = int(input("\nInput recordID to retrieve: "))
-    except:
-        print("Invalid input.\n")
+    #try:
+    #    recordID = int(input("\nInput recordID to retrieve: "))
+    #except:
+    #    print("Invalid input.\n")
 
 
     verified = contracts.functions.verify_AP(recordID).call()
@@ -361,10 +364,10 @@ def listCurrentPermissions(address):
 
         if access[2] not in latest:
             latest.append(access[2])
-                          #recordID
+
             if access[3] == 'R':
-                approved.append(access[0],access[2],access[4])
-                                #accessID, recordID, key
+            	approved.append([access[0],access[2],access[4]])
+                             	#accessID, recordID, key
     return approved
 
 
