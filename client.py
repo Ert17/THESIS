@@ -121,16 +121,22 @@ def userfunc(keys):
 
 
         elif choice == 3:
-            ownerWallet = currentAcct
+            ownerWallet = currentAcct #user
             recordID = int (input ('Enter record ID: '))
-            privKey = (input ('Enter private key (if owner, leave blank): '))
 
-            record = bheemo.retrieveRecord(ownerWallet, recordID)
+            isOwner = bheemo.checkOwner(recordID)
+
+            if isOwner == 1: #owner
+                record = bheemo.retrieveRecord(ownerWallet, recordID)
+            else:
+                privKey = (input ('Enter private key: '))
+                record = bheemo.recipientRetrieve(ownerWallet, keys, privKey, recordID)
+
             print(record)
 
 
         elif choice == 4:
-            notifList = bheemo.listNotification(currentAcct)
+            notifList = bheemo.listCurrentPermissions(currentAcct)
             print("\nNOTIFS TO")
             print(notifList)
 

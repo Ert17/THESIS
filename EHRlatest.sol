@@ -1,3 +1,5 @@
+// Version Date: 07/20
+
 // SPDX-License-Identifier: GPL-3.0
 
 pragma solidity >=0.8.0 <0.9.0;
@@ -334,8 +336,16 @@ contract EHR{
 
         if(isRecepient != -1) {
 
+            // with existing access permission
+            Permission memory OAP = permissions[uint(isRecepient)];
+
             // valid recipient of record
-            return 2;
+            if(keccak256(abi.encodePacked(OAP.access)) == keccak256(abi.encodePacked("R"))) {
+                return 2;
+            }
+
+            // revoked access permission
+            return 3;
         }
 
         // not valid owner or recipient
