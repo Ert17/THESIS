@@ -137,11 +137,16 @@ def userfunc(keys):
 
         elif choice == 4:
             notifList = bheemo.listCurrentPermissions(currentAcct)
-            print("\nNOTIFS TO")
+            print("\nCurrent Permissions ito")
             #print(notifList)
+            # download user keys here
 
+            userKeys = []
             for notif in notifList:
-            	print('Access ID: {}\nRecord ID: {}\nKey ID: {}\n'.format(notif[0], notif[1], notif[2]))
+                print('Access ID: {}\nRecord ID: {}\nKey ID: {}\n'.format(notif[0], notif[1], notif[2]))
+                userKeys.append(notif[2])
+
+            bheemo.saveUserKeys(keys, userKeys, currentAcct)
 
         elif choice == 5:
             logged = False
