@@ -1,4 +1,5 @@
 import bheemo
+import pickle as p
 
 keyID = None
 
@@ -129,17 +130,33 @@ def userfunc(keys):
             if isOwner == 1: #owner
                 record = bheemo.retrieveRecord(ownerWallet, recordID)
             else:
-                privKey = (input ('Enter private key: '))
-                record = bheemo.recipientRetrieve(ownerWallet, keys, privKey, recordID)
+                filename = (input ('Filename of key file: '))           # SAMPLE KEY FILE NAME : "keys-0x413c8A948fd58a72321ABF096367f1f1F80C8056"
+                keyID = (input ('Enter Key ID for record to be retrieved: '))
 
-            print(record)
+                # validate kay client side client file yung keyID
+                # if validated, pasa kay bheemo (validate -> yung keyID nasa key file niya)
+                # if not validated, error message
 
+                userKeys = {}
+                try:
+                    userKeys = p.load(open('priv_keys/' + filename, 'rb'))
+
+                    if userKeys.get(keyID):
+                         privKey = userKeys.get(keyID)
+                         print('private key na nakuha: ' + str(privKey))
+                         record = bheemo.recipientRetrieve(ownerWallet, keys, privKey, recordID)
+                         print(record)
+                    else:
+                        print('Key ID invalid.')
+                except:
+                    print("Filename invalid.")
 
         elif choice == 4:
             notifList = bheemo.listCurrentPermissions(currentAcct)
-            print("\nCurrent Permissions ito")
-            #print(notifList)
-            # download user keys here
+            print("\nCurrent Permissions: \n")
+
+            #option 1 -> single file for all keys; need: filename, keyID
+            #option 2 -> separate files for all keys; need: filename nung specific key
 
             userKeys = []
             for notif in notifList:
@@ -147,6 +164,7 @@ def userfunc(keys):
                 userKeys.append(notif[2])
 
             bheemo.saveUserKeys(keys, userKeys, currentAcct)
+            print('\nKeys downloaded.\n')
 
         elif choice == 5:
             logged = False
